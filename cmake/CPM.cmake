@@ -523,6 +523,12 @@ function(CPMAddPackage)
     list(APPEND CPM_ARGS_UNPARSED_ARGUMENTS DOWNLOAD_COMMAND ${CPM_ARGS_DOWNLOAD_COMMAND})
   elseif(DEFINED CPM_ARGS_SOURCE_DIR)
     list(APPEND CPM_ARGS_UNPARSED_ARGUMENTS SOURCE_DIR ${CPM_ARGS_SOURCE_DIR})
+
+    # Force re-fetch if source dir is missing or wiped clean from potential git clone
+    if (NOT EXISTS ${CPM_ARGS_SOURCE_DIR} OR (DEFINED CPM_ARGS_GIT_TAG AND NOT EXISTS ${CPM_ARGS_SOURCE_DIR}/.git))
+      string(TOLOWER ${CPM_ARGS_NAME} lower_case_name)
+      file(REMOVE_RECURSE ${CPM_FETCHCONTENT_BASE_DIR}/${lower_case_name}-subbuild)
+    endif()
   elseif(CPM_SOURCE_CACHE AND NOT CPM_ARGS_NO_CACHE)
     string(TOLOWER ${CPM_ARGS_NAME} lower_case_name)
     set(origin_parameters ${CPM_ARGS_UNPARSED_ARGUMENTS})
